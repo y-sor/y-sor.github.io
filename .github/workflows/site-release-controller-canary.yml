@@ -1,0 +1,33 @@
+name: Site release-controller canary
+
+on:
+  pull_request:
+    paths:
+      - "release-controller/**"
+      - ".github/workflows/site-release-controller-canary.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-release-controller-canary-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  controller-selftest:
+    name: Release controller fail-closed selftest
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Assert PR phase has no deployment/private-source secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "${CLOUDFLARE_API_TOKEN:-}"
+          test -z "${CLOUDFLARE_ACCOUNT_ID:-}"
+          test -z "${PRIVATE_SOURCE_TOKEN:-}"
+      - name: Run architecture canary
+        run: python3 release-controller/canary-selftest.py
