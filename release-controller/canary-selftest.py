@@ -85,7 +85,7 @@ with tempfile.TemporaryDirectory(prefix="release-controller-canary-") as d:
     run(src,"git","config","user.name","Release Canary")
     (src/"site").mkdir()
     (src/"site/index.html").write_text("<!doctype html><title>canary</title>\n")
-    (src/"release-ok.txt").write_text("FAIL\n")
+    (src/"release-ok.txt").write_text("OK\n")
     run(src,"git","add","."); run(src,"git","commit","-qm","fixture")
     head, tree=git_identity(src)
     receipt=make_receipt(src)
